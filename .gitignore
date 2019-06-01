@@ -1,4 +1,5 @@
-.gitignore
 *.DS_Store
 *.ipynb_checkpoints/
+*.idea
+__pycache__
 generated_sudokus/*
