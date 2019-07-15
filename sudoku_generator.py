@@ -2,13 +2,18 @@ import numpy as np
 import itertools
 import copy
 from PIL import Image, ImageDraw
+import imgaug as ia
+import imgaug.augmenters as iaa
+from imgaug.augmentables.kps import Keypoint, KeypointsOnImage
 
 
 class SudokuGenerator:
-    def __init__(self, dim, font, border=0.05):
+    def __init__(self, dim, border=0.05, batch_size=32):
         self.dim = dim
-        self.font = font
         self.border = border
+        self.batch_size = batch_size
+
+        self.font = self._get_font()
         self.outline, self.outer_corners = self._get_outline()
         self.squares = self._get_square_coordinates(
             self.outer_corners["t"],
@@ -19,13 +24,96 @@ class SudokuGenerator:
         self.corner_points = self._get_unique_corner_points()
         self.base_img = self._draw_raster()
 
-    def generate(self, number_density):
-        img = copy.copy(self.base_img)
+    def _get_font(self):
+        from matplotlib.font_manager import FontManager
+        from PIL import ImageFont
+
+        font_finder = FontManager()
+        font_path = font_finder.findfont("arial")
+        return ImageFont.truetype(font_path, 35)
+
+    def generate_batch(self, augment=True):
+        while True:
+            sudoku_list = []
+            corners_list = []
+
+            for i in range(self.batch_size):
+                sudoku, corners = self._generate_one(
+                    number_density=np.random.uniform(0.05, 0.20)
+                )
+                sudoku_list.append(sudoku)
+                corners_list.append(corners)
+
+            sudoku_array = np.array(sudoku_list)
+            corners_array = np.array(corners_list)
+
+            if augment:
+                sudoku_array, corners_array = self._augment_batch(
+                    sudoku_array, corners_array
+                )
+
+            yield (sudoku_array, corners_array.reshape(32, 8))
+
+    def _augment_batch(self, images, corners):
+        # seq = iaa.Sequential(
+        #     [
+        #         iaa.Affine(translate_px={"x": (10, 30)}, rotate=(-10, 10)),
+        #         iaa.AddToHueAndSaturation((-50, 50)),
+        #     ]
+        # )
+
+        aug = iaa.SomeOf(
+            (0, None),
+            [
+                iaa.KeepSizeByResize(
+                    iaa.Affine(
+                        translate_px={"x": (10, 30)},
+                        rotate=(-5, 5),
+                        mode="edge",
+                        fit_output=True,
+                    )
+                ),
+                iaa.KeepSizeByResize(
+                    iaa.Affine(shear=(-10, 10), mode="edge", fit_output=True)
+                ),
+                iaa.AddToHueAndSaturation((-50, 50)),
+                iaa.AverageBlur(k=(2, 5))
+                # iaa.AdditiveGaussianNoise(scale=0.2 * 255),
+                # iaa.Add(50, per_channel=True),
+                # iaa.Sharpen(alpha=0.5),
+            ],
+            random_order=True,
+        )
+
+        # Convert array of corners to list of KeypointsOnImage instances for use with the augmenter.
+        keypoints_from_corners = [
+            KeypointsOnImage(
+                [Keypoint(x=point[0], y=point[1]) for point in img_corners],
+                shape=self.dim,
+            )
+            for img_corners in corners
+        ]
+
+        images_augm, keypoints_augm = aug.augment(
+            images=images, keypoints=keypoints_from_corners
+        )
+
+        # Convert augmented keypoints back to array of size (batch_size, 4, 2).
+        corners_augm = np.array(
+            [keypoints.to_xy_array() for keypoints in keypoints_augm]
+        )
+
+        return images_augm, corners_augm
+
+    def _generate_one(self, number_density):
+        sudoku = copy.copy(self.base_img)
         for sq in self.squares:
             if np.random.uniform() < number_density:
-                self._add_number_to_square(img, sq)
+                self._add_number_to_square(sudoku, sq)
 
-        return np.asarray(img), self.corner_points
+        sudoku = np.array(sudoku)
+        corners = np.array(self.outline)
+        return sudoku, corners
 
     def _get_outline(self):
         top = int(self.border * self.dim[1])
