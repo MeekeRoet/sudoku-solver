@@ -55,13 +55,6 @@ class SudokuGenerator:
             yield (sudoku_array, corners_array.reshape(32, 8))
 
     def _augment_batch(self, images, corners):
-        # seq = iaa.Sequential(
-        #     [
-        #         iaa.Affine(translate_px={"x": (10, 30)}, rotate=(-10, 10)),
-        #         iaa.AddToHueAndSaturation((-50, 50)),
-        #     ]
-        # )
-
         aug = iaa.SomeOf(
             (0, None),
             [
@@ -77,10 +70,7 @@ class SudokuGenerator:
                     iaa.Affine(shear=(-10, 10), mode="edge", fit_output=True)
                 ),
                 iaa.AddToHueAndSaturation((-50, 50)),
-                iaa.AverageBlur(k=(2, 5))
-                # iaa.AdditiveGaussianNoise(scale=0.2 * 255),
-                # iaa.Add(50, per_channel=True),
-                # iaa.Sharpen(alpha=0.5),
+                iaa.AverageBlur(k=(2, 5)),
             ],
             random_order=True,
         )
