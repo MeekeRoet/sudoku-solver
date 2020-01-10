@@ -1,6 +1,6 @@
 # Sudoku solver
 This web app allows one to upload - or take and upload, on mobile devices - a photo of a sudoku puzzle and have it
- automatically recognized and solved.
+ automatically recognized and solved. Co-created with three colleagues and a friend.
 
 ## Run locally
 1. Install GLPK, which is the optimization suite used as a backend by `pyomo` for the sudoku solver. On Linux you can
