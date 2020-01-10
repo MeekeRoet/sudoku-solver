@@ -5,7 +5,7 @@
             <p>
                 Sudoku could not be solved. The most likely cause is that some digits were not recognized correctly. Please correct them below and submit.
             </p>
-            <form action="{{ url_for('manual_recognition') }}" method="POST">
+            <form action="{{ url_for('digit_correction_by_user') }}" method="POST">
                 <table id="grid">
                     {% for number in data["recognized_digits"] %}
                         {% if (loop.index - 1) % 9 == 0 %}
@@ -25,7 +25,7 @@
                 </table>
 
                 <input name="image_path" type="hidden" value="{{ data['image_path'] }}">
-                <input name="preprocessed_image_path" type="hidden" value="{{ data['preprocessed_image_path'] }}">
+                <input name="preprocessed_img_path" type="hidden" value="{{ data['preprocessed_img_path'] }}">
 
                 <br/>
                 <button type="submit" class="btn btn-primary btn-sm">Submit</button>

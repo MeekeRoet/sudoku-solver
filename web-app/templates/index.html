@@ -19,17 +19,17 @@
             <div class="row">
                <div class="col-md-6 col-sm-12">
                   <h3>Submit new file:</h3>
-                  {% include 'upload_form.html' %}
+                  {% include 'upload_form_new_img.html' %}
                </div>
                <div class="col-md-6 col-sm-12">
                  <h3>Submit old file:</h3>
-                  {% include 'upload_form_history.html' %}
+                  {% include 'upload_form_old_img.html' %}
                </div>
             </div>
          </div>
 
          {% if "solved_sudoku" in data %}
-            {% include 'manual_recognition.html' %}
+            {% include 'manual_digit_correction.html' %}
          {% endif %}
 
          <div class="container">
@@ -41,10 +41,10 @@
                      </div>
                   {% endif %}
 
-                  {% if "preprocessed_image_path" in data %}
+                  {% if "preprocessed_img_path" in data %}
                      <div class="col-md-4 col-sm-12">
                         <h3>Preprocessed Image</h3>
-                        <img class="pp_img" src="{{ data['preprocessed_image_path'] }}"/>
+                        <img class="pp_img" src="{{ data['preprocessed_img_path'] }}"/>
                      </div>
                   {% endif %}
 
