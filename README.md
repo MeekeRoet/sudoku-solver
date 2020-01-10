@@ -1,6 +1,8 @@
 # Sudoku solver
-This web app allows one to upload - or take and upload, on mobile devices - a photo of a sudoku puzzle and have it
- automatically recognized and solved. Co-created with three colleagues and a friend. It looks as follows:
+This web app lets one upload - or take and upload, on mobile devices - a photo of a sudoku puzzle and have it
+ automatically recognized and solved. It also allows the user to correct the digits if they were not recognized correctly. Co-created with three colleagues and a friend.
+ 
+ It looks as follows:
 
 ![Screenshot of the web app](webapp_screenshot.png?raw=true")
 
