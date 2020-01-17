@@ -1,3 +1,5 @@
+# This part was strongly inspired by Nesh Patel (https://medium.com/@neshpatel/solving-sudoku-part-ii-9a7019d196a2)
+
 from typing import List
 import operator
 import numpy as np
